@@ -79,7 +79,7 @@ class DVRouter(basics.DVRouterBase):
             if packet.dst in self.distanceVector:
                 if self.distanceVector[packet.dst][1] != port:
                     self.send(packet, self.distanceVector[packet.dst][1])
-                    print self.distanceVector
+                    print self.name
 
 
     def handle_timer(self):
