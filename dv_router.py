@@ -34,7 +34,7 @@ class DVRouter(basics.DVRouterBase):
         """
         self.neighbors[port] = latency
         for host in self.distanceVector:
-            packet = RoutePacket(host, self.distanceVector[host][0])
+            packet = basics.RoutePacket(host, self.distanceVector[host][0])
             self.send(packet, port)
 
 
@@ -91,7 +91,7 @@ class DVRouter(basics.DVRouterBase):
         for port in self.neighbors:
             for host in self.distanceVector:
                 if self.distanceVector[host][1] != port:
-                    packet = RoutePacket(host, self.distanceVector[host][0])
+                    packet = basics.RoutePacket(host, self.distanceVector[host][0])
                     self.send(packet, port)
 
     def expire_route(self, host):
