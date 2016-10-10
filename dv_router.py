@@ -10,7 +10,8 @@ INFINITY = 16
 class DVRouter(basics.DVRouterBase):
     # NO_LOG = True # Set to True on an instance to disable its logging
     # POISON_MODE = True # Can override POISON_MODE here
-    # DEFAULT_TIMER_INTERVAL = 5 # Can override this yourself for testing
+    DEFAULT_TIMER_INTERVAL = 5 # Can override this yourself for testing
+
 
     def __init__(self):
         """
@@ -68,7 +69,7 @@ class DVRouter(basics.DVRouterBase):
                     self.distanceVector[packet.destination] = [packet.latency + self.neighbors[port], port]
             else:
                 self.distanceVector[packet.destination] = [packet.latency, port]
-            api.create_timer(basics.DEFAULT_TIMER_INTERVAL, expire_route, True, False, (self, host))
+            api.create_timer(DEFAULT_TIMER_INTERVAL, expire_route, True, False, (self, host))
         elif isinstance(packet, basics.HostDiscoveryPacket):
             self.distanceVector[packet.src] = [self.neighbors[port], port]
         else:
