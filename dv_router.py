@@ -23,6 +23,7 @@ class DVRouter(basics.DVRouterBase):
         self.routingTable = {} # maps ports to latency and hosts
         self.distanceVector = {} # maps hosts to latency and first hop
         self.neighbors = {} # maps ports to latency
+        self.directHosts = {}
         self.start_timer()  # Starts calling handle_timer() at correct rate
 
     def handle_link_up(self, port, latency):
@@ -72,6 +73,7 @@ class DVRouter(basics.DVRouterBase):
             api.create_timer(15, self.expire_route, False, False, [packet.destination])
         elif isinstance(packet, basics.HostDiscoveryPacket):
             self.distanceVector[packet.src] = [self.neighbors[port], port]
+            self.directHosts[port] = packet.src
         else:
             # Totally wrong behavior for the sake of demonstration only: send
             # the packet back to where it came from!
@@ -91,6 +93,9 @@ class DVRouter(basics.DVRouterBase):
         have expired.
 
         """
+        for directHost in self.directHosts.keys():
+            if directHost not in self.distanceVector.keys():
+                self.distanceVector[self.directHosts[directHost]] = [self.neighbors[directHost], directHost]
         for port in self.neighbors.keys():
             for host in self.distanceVector.keys():
                 if self.distanceVector[host][1] != port:
