@@ -37,7 +37,6 @@ class DVRouter(basics.DVRouterBase):
         for host in self.distanceVector.keys():
             packet = basics.RoutePacket(host, self.distanceVector[host][0])
             self.send(packet, port)
-            print "route packet!"
 
 
     def handle_link_down(self, port):
@@ -80,7 +79,7 @@ class DVRouter(basics.DVRouterBase):
             if packet.dst in self.distanceVector:
                 if self.distanceVector[packet.dst][1] != port:
                     self.send(packet, self.distanceVector[packet.dst][1])
-                    print "regular packet!"
+                    print self.distanceVector
 
 
     def handle_timer(self):
