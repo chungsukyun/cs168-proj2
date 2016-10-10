@@ -35,7 +35,7 @@ class DVRouter(basics.DVRouterBase):
         """
         self.neighbors[port] = latency
         for host in self.distanceVector:
-            packet = RoutePacket(self.distanceVector[host][1], self.distanceVector[host][0])
+            packet = RoutePacket(host, self.distanceVector[host][0])
             self.send(packet, port)
 
 
@@ -63,18 +63,18 @@ class DVRouter(basics.DVRouterBase):
             self.routingTable[port] = [packet.latency, packet.destination]
             if packet.destination in self.distanceVector:
                 if self.distanceVector[packet.destination][0] >= packet.latency + self.neighbors[port]:
-                    self.distanceVector[packet.destination] = [packet.latency + self.neighbors[port], packet.src]
+                    self.distanceVector[packet.destination] = [packet.latency + self.neighbors[port], port]
             else:
-                self.distanceVector[packet.destination] = [packet.latency, packet.src]
+                self.distanceVector[packet.destination] = [packet.latency, port]
         elif isinstance(packet, basics.HostDiscoveryPacket):
             self.hostToPort[packet.src] = port
-            self.distanceVector[packet.src] = [self.neighbors[port], packet.src]
+            self.distanceVector[packet.src] = [self.neighbors[port], port]
         else:
             # Totally wrong behavior for the sake of demonstration only: send
             # the packet back to where it came from!
             # self.send(packet, port=port)
             if packet.dst in self.distanceVector:
-                self.send(packet, self.distanceVector[packet.dst])
+                self.send(packet, self.distanceVector[packet.dst][1])
 
 
     def handle_timer(self):
