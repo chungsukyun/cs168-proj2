@@ -70,7 +70,7 @@ class DVRouter(basics.DVRouterBase):
             else:
                 self.distanceVector[packet.destination] = [packet.latency, port]
             api.create_timer(basics.DVRouterBase.DEFAULT_TIMER_INTERVAL, self.expire_route, True, True, (packet.destination)
-        elif isinstance(packet, basics.HostDiscoveryPacket):
+        else if isinstance(packet, basics.HostDiscoveryPacket):
             self.distanceVector[packet.src] = [self.neighbors[port], port]
         else:
             # Totally wrong behavior for the sake of demonstration only: send
