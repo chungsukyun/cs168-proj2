@@ -47,7 +47,7 @@ class DVRouter(basics.DVRouterBase):
         """
         self.neighbors.pop(port)
         for host in self.distanceVector:
-            if self.distanceVector[host][1] = port:
+            if self.distanceVector[host][1] == port:
                 self.distanceVector.pop(host)
 
     def handle_rx(self, packet, port):
