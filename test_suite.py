@@ -21,7 +21,7 @@ def main():
     t.test('learning_switch', 'tests.test_learning')
     t.test('dv_router', 'tests.test_simple')
     t.test('dv_router', 'tests.test_failure')
-    #t.test('dv_router', 'tests.test_initialize_neighbor')
+    t.test('dv_router', 'tests.test_initialize_neighbor')
     #t.test('dv_router', 'tests.test_no_hairpin')
     #t.test('dv_router', 'tests.test_link_weights')
     #t.test('dv_router', 'tests.test_expire_routes')
