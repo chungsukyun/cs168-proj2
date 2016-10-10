@@ -51,6 +51,8 @@ class DVRouter(basics.DVRouterBase):
         for host in self.distanceVector.keys():
             if self.distanceVector[host][1] == port:
                 self.distanceVector.pop(host)
+                if host in self.directHosts.keys():
+                    self.distanceVector[host] = [self.neighbors[host], self.directHosts[host]]
 
     def handle_rx(self, packet, port):
         """
@@ -73,7 +75,7 @@ class DVRouter(basics.DVRouterBase):
             api.create_timer(15, self.expire_route, False, False, [packet.destination])
         elif isinstance(packet, basics.HostDiscoveryPacket):
             self.distanceVector[packet.src] = [self.neighbors[port], port]
-            self.directHosts[port] = packet.src
+            self.directHosts[packet.src] = port
         else:
             # Totally wrong behavior for the sake of demonstration only: send
             # the packet back to where it came from!
@@ -81,7 +83,6 @@ class DVRouter(basics.DVRouterBase):
             if packet.dst in self.distanceVector:
                 if self.distanceVector[packet.dst][1] != port:
                     self.send(packet, self.distanceVector[packet.dst][1])
-                    print self.name
 
 
     def handle_timer(self):
@@ -93,9 +94,6 @@ class DVRouter(basics.DVRouterBase):
         have expired.
 
         """
-        for directHost in self.directHosts.keys():
-            if directHost not in self.distanceVector.keys():
-                self.distanceVector[self.directHosts[directHost]] = [self.neighbors[directHost], directHost]
         for port in self.neighbors.keys():
             for host in self.distanceVector.keys():
                 if self.distanceVector[host][1] != port:
