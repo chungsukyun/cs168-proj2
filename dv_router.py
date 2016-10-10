@@ -96,6 +96,7 @@ class DVRouter(basics.DVRouterBase):
                     self.send(packet, port)
 
     def expire_route(self, host):
-        self.distanceVector.pop(host)
+        if host in self.distanceVector.keys():
+            self.distanceVector.pop(host)
 
 
