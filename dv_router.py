@@ -47,7 +47,7 @@ class DVRouter(basics.DVRouterBase):
 
         """
         self.neighbors.pop(port)
-        for host in self.distanceVector:
+        for host in self.distanceVector,keys():
             if self.distanceVector[host][1] == port:
                 self.distanceVector.pop(host)
 
@@ -89,8 +89,8 @@ class DVRouter(basics.DVRouterBase):
         have expired.
 
         """
-        for port in self.neighbors:
-            for host in self.distanceVector:
+        for port in self.neighbors.keys():
+            for host in self.distanceVector.keys():
                 if self.distanceVector[host][1] != port:
                     packet = basics.RoutePacket(host, self.distanceVector[host][0])
                     self.send(packet, port)
