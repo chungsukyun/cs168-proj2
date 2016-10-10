@@ -34,7 +34,7 @@ class DVRouter(basics.DVRouterBase):
 
         """
         self.neighbors[port] = latency
-        for host in self.distanceVector:
+        for host in self.distanceVector.keys():
             packet = basics.RoutePacket(host, self.distanceVector[host][0])
             self.send(packet, port)
 
@@ -69,7 +69,7 @@ class DVRouter(basics.DVRouterBase):
                     self.distanceVector[packet.destination] = [packet.latency + self.neighbors[port], port]
             else:
                 self.distanceVector[packet.destination] = [packet.latency, port]
-            # api.create_timer(basics.DVRouterBase.DEFAULT_TIMER_INTERVAL, self.expire_route(packet.destination))
+            api.create_timer(basics.DVRouterBase.DEFAULT_TIMER_INTERVAL, self.expire_route(packet.destination))
         elif isinstance(packet, basics.HostDiscoveryPacket):
             self.distanceVector[packet.src] = [self.neighbors[port], port]
         else:
