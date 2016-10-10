@@ -22,7 +22,6 @@ class DVRouter(basics.DVRouterBase):
         self.routingTable = {} # maps ports to latency and hosts
         self.distanceVector = {} # maps hosts to latency and first hop
         self.neighbors = {} # maps ports to latency
-        self.hostToPort = {} # maps hosts to ports that it is directly connected to
         self.start_timer()  # Starts calling handle_timer() at correct rate
 
     def handle_link_up(self, port, latency):
@@ -46,7 +45,10 @@ class DVRouter(basics.DVRouterBase):
         The port number used by the link is passed in.
 
         """
-        pass
+        self.neighbors.pop(port)
+        for host in self.distanceVector:
+            if self.distanceVector[host][1] = port:
+                self.distanceVector.pop(host)
 
     def handle_rx(self, packet, port):
         """
@@ -66,8 +68,8 @@ class DVRouter(basics.DVRouterBase):
                     self.distanceVector[packet.destination] = [packet.latency + self.neighbors[port], port]
             else:
                 self.distanceVector[packet.destination] = [packet.latency, port]
+            api.create_timer(DEFAULT_TIMER_INTERVAL, expire_route, True, False, (self, host))
         elif isinstance(packet, basics.HostDiscoveryPacket):
-            self.hostToPort[packet.src] = port
             self.distanceVector[packet.src] = [self.neighbors[port], port]
         else:
             # Totally wrong behavior for the sake of demonstration only: send
@@ -86,4 +88,13 @@ class DVRouter(basics.DVRouterBase):
         have expired.
 
         """
-        pass
+        for port in self.neighbors:
+            for host in self.distanceVector:
+                if self.distanceVector[host][1] != port:
+                    packet = RoutePacket(host, self.distanceVector[host][0])
+                    self.send(packet, port)
+
+    def expire_route(self, host):
+        self.distanceVector.pop(host)
+
+
