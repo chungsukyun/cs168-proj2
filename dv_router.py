@@ -19,7 +19,7 @@ class DVRouter(basics.DVRouterBase):
         You probably want to do some additional initialization here.
 
         """
-        self.routingTable = {} # maps ports to host
+        self.routingTable = {} # maps ports to latency and hosts
         self.distanceVector = {} # maps hosts to latency and first hop
         self.neighbors = {} # maps ports to latency
         self.hostToPort = {} # maps hosts to ports that it is directly connected to
@@ -60,7 +60,12 @@ class DVRouter(basics.DVRouterBase):
         """
         #self.log("RX %s on %s (%s)", packet, port, api.current_time())
         if isinstance(packet, basics.RoutePacket):
-            self.distanceVector[packet.destination] = [packet.latency, packet.src]
+            self.routingTable[port] = [packet.latency, packet.destination]
+            if packet.destination in self.distanceVector:
+                if self.distanceVector[packet.destination][0] >= packet.latency + self.neighbors[port]:
+                    self.distanceVector[packet.destination] = [packet.latency + self.neighbors[port], packet.src]
+            else:
+                self.distanceVector[packet.destination] = [packet.latency, packet.src]
         elif isinstance(packet, basics.HostDiscoveryPacket):
             self.hostToPort[packet.src] = port
             self.distanceVector[packet.src] = [self.neighbors[port], packet.src]
