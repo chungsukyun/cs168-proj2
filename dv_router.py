@@ -19,6 +19,10 @@ class DVRouter(basics.DVRouterBase):
         You probably want to do some additional initialization here.
 
         """
+        self.routingTable = {} # maps ports to host
+        self.distanceVector = {} # maps hosts to latency and first hop
+        self.neighbors = {} # maps ports to latency
+        self.hostToPort = {} # maps hosts to ports that it is directly connected to
         self.start_timer()  # Starts calling handle_timer() at correct rate
 
     def handle_link_up(self, port, latency):
@@ -29,7 +33,11 @@ class DVRouter(basics.DVRouterBase):
         in.
 
         """
-        pass
+        self.neighbors[port] = latency
+        for host in self.distanceVector:
+            packet = RoutePacket(self.distanceVector[host][1], self.distanceVector[host][0])
+            self.send(packet, port)
+
 
     def handle_link_down(self, port):
         """
@@ -52,13 +60,17 @@ class DVRouter(basics.DVRouterBase):
         """
         #self.log("RX %s on %s (%s)", packet, port, api.current_time())
         if isinstance(packet, basics.RoutePacket):
-            pass
+            self.distanceVector[packet.destination] = [packet.latency, packet.src]
         elif isinstance(packet, basics.HostDiscoveryPacket):
-            pass
+            self.hostToPort[packet.src] = port
+            self.distanceVector[packet.src] = [self.neighbors[port], packet.src]
         else:
             # Totally wrong behavior for the sake of demonstration only: send
             # the packet back to where it came from!
-            self.send(packet, port=port)
+            # self.send(packet, port=port)
+            if packet.dst in self.distanceVector:
+                self.send(packet, self.distanceVector[packet.dst])
+
 
     def handle_timer(self):
         """
